@@ -10,6 +10,21 @@ import {
 
 export const ME_USER_ID = "u1";
 
+export type UserProfile = {
+  name: string;
+  handle: string;
+  bio: string;
+  avatarColor: string;
+  avatarImageUrl?: string;
+};
+
+const DEFAULT_PROFILE: UserProfile = {
+  name: "あなたの名前",
+  handle: "your_handle",
+  bio: "",
+  avatarColor: "#6366f1",
+};
+
 type AddPostParams = {
   projectId?: string;
   projectTitle?: string;
@@ -21,6 +36,8 @@ type DataContextValue = {
   posts: Post[];
   projects: Project[];
   users: User[];
+  profile: UserProfile;
+  updateProfile: (p: UserProfile) => void;
   addPost: (params: AddPostParams) => void;
   getUserById: (id: string) => User | undefined;
   getProjectById: (id: string) => Project | undefined;
@@ -34,21 +51,26 @@ const COVER_COLORS = ["#1e1b4b", "#0f172a", "#1c1917", "#172554", "#14532d", "#3
 const STORAGE_VERSION = "v2";
 
 export function DataProvider({ children }: { children: ReactNode }) {
-  const [posts, setPosts] = useState<Post[]>(seedPosts);
+  const [posts, setPosts]       = useState<Post[]>(seedPosts);
   const [projects, setProjects] = useState<Project[]>(seedProjects);
+  const [profile, setProfile]   = useState<UserProfile>(DEFAULT_PROFILE);
 
   useEffect(() => {
     if (localStorage.getItem("wiplog-version") !== STORAGE_VERSION) {
       localStorage.removeItem("wiplog-posts");
       localStorage.removeItem("wiplog-projects");
       localStorage.setItem("wiplog-version", STORAGE_VERSION);
-      return;
+    } else {
+      try {
+        const sp = localStorage.getItem("wiplog-posts");
+        const sj = localStorage.getItem("wiplog-projects");
+        if (sp) setPosts(JSON.parse(sp));
+        if (sj) setProjects(JSON.parse(sj));
+      } catch {}
     }
     try {
-      const sp = localStorage.getItem("wiplog-posts");
-      const sj = localStorage.getItem("wiplog-projects");
-      if (sp) setPosts(JSON.parse(sp));
-      if (sj) setProjects(JSON.parse(sj));
+      const pf = localStorage.getItem("wiplog-profile");
+      if (pf) setProfile(JSON.parse(pf));
     } catch {}
   }, []);
 
@@ -59,6 +81,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem("wiplog-projects", JSON.stringify(projects));
   }, [projects]);
+
+  const updateProfile = useCallback((p: UserProfile) => {
+    setProfile(p);
+    localStorage.setItem("wiplog-profile", JSON.stringify(p));
+  }, []);
 
   const addPost = useCallback(({ projectId, projectTitle, progress, content }: AddPostParams) => {
     let resolvedId = projectId;
@@ -106,8 +133,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [projects]);
 
   const getUserById = useCallback(
-    (id: string) => seedUsers.find((u) => u.id === id),
-    []
+    (id: string): User | undefined => {
+      if (id === ME_USER_ID) {
+        return {
+          id: ME_USER_ID,
+          name: profile.name,
+          handle: profile.handle,
+          avatarColor: profile.avatarColor,
+          avatarImageUrl: profile.avatarImageUrl,
+        };
+      }
+      return seedUsers.find((u) => u.id === id);
+    },
+    [profile]
   );
 
   const getProjectById = useCallback(
@@ -136,15 +174,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
       .map((post) => ({
         ...post,
         project: projects.find((p) => p.id === post.projectId)!,
-        user: seedUsers.find((u) => u.id === post.userId)!,
+        user: getUserById(post.userId)!,
       }))
       .filter((item) => item.project && item.user);
-  }, [posts, projects]);
+  }, [posts, projects, getUserById]);
 
   return (
     <DataContext.Provider value={{
-      posts, projects, users: seedUsers,
-      addPost, getUserById, getProjectById, getPostsByProjectId, getLatestPostsForTimeline,
+      posts, projects, users: seedUsers, profile,
+      updateProfile, addPost, getUserById, getProjectById, getPostsByProjectId, getLatestPostsForTimeline,
     }}>
       {children}
     </DataContext.Provider>

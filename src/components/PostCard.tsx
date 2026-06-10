@@ -29,10 +29,15 @@ export default function PostCard({ post, project, user, showProjectLink = true }
       {/* Header */}
       <div className="flex items-start gap-3 mb-4">
         <div
-          className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+          className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0 overflow-hidden"
           style={{ background: user.avatarColor }}
         >
-          {user.name[0]}
+          {user.avatarImageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={user.avatarImageUrl} alt={user.name} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-white">{user.name[0]}</span>
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">

@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import ThemeProvider from "@/components/ThemeProvider";
 import FavoritesProvider from "@/components/FavoritesProvider";
+import { DataProvider } from "@/lib/store";
 import SidebarLayout from "@/components/SidebarLayout";
 
 const geistSans = Geist({
@@ -33,10 +34,12 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col" style={{ background: "var(--bg-base)" }}>
         <ThemeProvider>
+          <DataProvider>
           <FavoritesProvider>
             <Navbar />
             <SidebarLayout>{children}</SidebarLayout>
           </FavoritesProvider>
+          </DataProvider>
         </ThemeProvider>
       </body>
     </html>

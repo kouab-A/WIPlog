@@ -4,9 +4,11 @@ import Link from "next/link";
 import { Layers, Home, PlusCircle, Sun, Moon } from "lucide-react";
 import ThemeSelector from "./ThemeSelector";
 import { useTheme } from "./ThemeProvider";
+import { useData } from "@/lib/store";
 
 export default function Navbar() {
   const { colorMode, toggleColorMode } = useTheme();
+  const { profile } = useData();
 
   return (
     <header
@@ -17,24 +19,46 @@ export default function Navbar() {
       }}
     >
       <div className="max-w-[1200px] mx-auto px-4 h-14 flex items-center justify-between w-full">
-        <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-          <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center"
-            style={{ background: "var(--accent)" }}
+
+        {/* Left: avatar + logo */}
+        <div className="flex items-center gap-3">
+          {/* Avatar button → profile page */}
+          <Link
+            href="/profile"
+            className="group relative flex items-center justify-center w-8 h-8 rounded-full overflow-hidden transition-all hover:ring-2"
+            style={{
+              background: profile.avatarColor,
+            }}
+            title="プロフィールを編集"
           >
-            <Layers size={14} className="text-white" />
-          </div>
-          <span style={{ color: "var(--text-primary)" }}>WIPlog</span>
-          <span
-            className="text-xs font-normal px-1.5 py-0.5 rounded"
-            style={{ background: "var(--accent-glow)", color: "var(--accent)" }}
-          >
-            β
-          </span>
-        </Link>
+            {profile.avatarImageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={profile.avatarImageUrl} alt="avatar" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-xs font-bold text-white">
+                {profile.name.trim()[0] ?? "?"}
+              </span>
+            )}
+          </Link>
+
+          <Link href="/" className="flex items-center gap-2 font-bold text-lg">
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center"
+              style={{ background: "var(--accent)" }}
+            >
+              <Layers size={14} className="text-white" />
+            </div>
+            <span style={{ color: "var(--text-primary)" }}>WIPlog</span>
+            <span
+              className="text-xs font-normal px-1.5 py-0.5 rounded"
+              style={{ background: "var(--accent-glow)", color: "var(--accent)" }}
+            >
+              β
+            </span>
+          </Link>
+        </div>
 
         <nav className="flex items-center gap-1">
-          {/* ライト / ダーク切替 */}
           <button
             onClick={toggleColorMode}
             className="flex items-center justify-center w-8 h-8 rounded-lg transition-colors hover:bg-black/5"

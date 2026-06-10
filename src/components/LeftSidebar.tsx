@@ -4,12 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FolderOpen, ChevronRight, Plus, X, Send, CheckCircle2 } from "lucide-react";
-import { projects } from "@/lib/data";
+import { useData } from "@/lib/store";
 import ProgressBar from "./ProgressBar";
 
 export default function LeftSidebar() {
   const pathname = usePathname();
   const activeId = pathname.startsWith("/projects/") ? pathname.split("/")[2] : null;
+  const { projects, addPost } = useData();
 
   const [expandedId,   setExpandedId]   = useState<string | null>(null);
   const [formProgress, setFormProgress] = useState(50);
@@ -28,6 +29,7 @@ export default function LeftSidebar() {
 
   const handleSubmit = (projectId: string) => {
     if (!formContent.trim()) return;
+    addPost({ projectId, progress: formProgress, content: formContent });
     setDoneId(projectId);
     setExpandedId(null);
     setFormContent("");
@@ -126,9 +128,9 @@ export default function LeftSidebar() {
                     onClick={() => openForm(p.id, p.currentProgress)}
                     className="flex items-center gap-1 text-xs px-2 py-1 rounded-lg transition-colors ml-auto"
                     style={{
-                      background: isExpanded ? "var(--accent)" : "var(--bg-elevated)",
-                      color: isExpanded ? "white" : "var(--text-muted)",
-                      border: `1px solid ${isExpanded ? "transparent" : "var(--border)"}`,
+                      background: isExpanded ? "var(--accent)" : "var(--accent-glow)",
+                      color: isExpanded ? "white" : "var(--accent)",
+                      border: `1px solid ${isExpanded ? "transparent" : "var(--accent-dim)"}`,
                     }}
                   >
                     {isExpanded ? <X size={11} /> : <Plus size={11} />}

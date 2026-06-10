@@ -1,16 +1,17 @@
+"use client";
+
+import { use } from "react";
 import { notFound } from "next/navigation";
-import {
-  getProjectById,
-  getPostsByProjectId,
-  getUserById,
-} from "@/lib/data";
+import { useData } from "@/lib/store";
 import PostCard from "@/components/PostCard";
 import ProjectDetailHeader from "@/components/ProjectDetailHeader";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-export default async function ProjectPage({ params }: PageProps<"/projects/[id]">) {
-  const { id } = await params;
+export default function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const { getProjectById, getPostsByProjectId, getUserById } = useData();
+
   const project = getProjectById(id);
   if (!project) notFound();
 
