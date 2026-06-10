@@ -3,11 +3,20 @@
 import Link from "next/link";
 import { useTheme } from "./ThemeProvider";
 import ProgressBar from "./ProgressBar";
-import { projects } from "@/lib/data";
+import { useData } from "@/lib/store";
 
 export default function ProjectStrip() {
   const { colorMode } = useTheme();
   const isDark = colorMode === "dark";
+  const { projects } = useData();
+
+  if (projects.length === 0) {
+    return (
+      <p className="text-xs py-2" style={{ color: "var(--text-muted)" }}>
+        まだプロジェクトがありません。進捗を投稿すると自動で作成されます。
+      </p>
+    );
+  }
 
   return (
     <div className="flex gap-2 overflow-x-auto pb-2">

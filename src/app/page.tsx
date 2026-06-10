@@ -1,4 +1,6 @@
-import { getLatestPostsForTimeline } from "@/lib/data";
+"use client";
+
+import { useData } from "@/lib/store";
 import PostCard from "@/components/PostCard";
 import PostForm from "@/components/PostForm";
 import ProjectStrip from "@/components/ProjectStrip";
@@ -6,6 +8,7 @@ import Link from "next/link";
 import { Zap, ArrowRight } from "lucide-react";
 
 export default function HomePage() {
+  const { getLatestPostsForTimeline } = useData();
   const timelinePosts = getLatestPostsForTimeline();
 
   return (
@@ -64,30 +67,46 @@ export default function HomePage() {
           </span>
         </div>
 
-        <div className="flex flex-col gap-4">
-          {timelinePosts.map((item) => (
-            <PostCard
-              key={item.id}
-              post={item}
-              project={item.project}
-              user={item.user}
-              showProjectLink={true}
-            />
-          ))}
-        </div>
-
-        <div className="mt-8 text-center">
-          <button
-            className="flex items-center gap-2 mx-auto text-sm px-4 py-2 rounded-lg transition-colors"
-            style={{
-              color: "var(--text-muted)",
-              border: "1px solid var(--border)",
-            }}
+        {timelinePosts.length === 0 ? (
+          <div
+            className="rounded-xl p-10 text-center"
+            style={{ border: "1px dashed var(--border)" }}
           >
-            <span>もっと見る</span>
-            <ArrowRight size={14} />
-          </button>
-        </div>
+            <p className="text-sm mb-1" style={{ color: "var(--text-muted)" }}>
+              まだ投稿がありません
+            </p>
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+              上のフォームから最初の進捗を記録しましょう
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-col gap-4">
+              {timelinePosts.map((item) => (
+                <PostCard
+                  key={item.id}
+                  post={item}
+                  project={item.project}
+                  user={item.user}
+                  showProjectLink={true}
+                />
+              ))}
+            </div>
+
+            <div className="mt-8 text-center">
+              <button
+                className="flex items-center gap-2 mx-auto text-sm px-4 py-2 rounded-lg transition-colors"
+                style={{
+                  color: "var(--text-muted)",
+                  border: "1px solid var(--border)",
+                }}
+              >
+                <span>もっと見る</span>
+                <ArrowRight size={14} />
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
