@@ -16,6 +16,14 @@ export type Post = {
   createdAt: string;
 };
 
+export type Comment = {
+  id: string;
+  postId: string;
+  authorName: string;
+  content: string;
+  createdAt: string;
+};
+
 export type Project = {
   id: string;
   userId: string;

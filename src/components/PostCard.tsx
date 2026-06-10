@@ -6,6 +6,7 @@ import type { Post, Project, User } from "@/lib/data";
 import { formatRelativeDate } from "@/lib/data";
 import ProgressBar from "./ProgressBar";
 import { useFavorites } from "./FavoritesProvider";
+import { useData } from "@/lib/store";
 
 type Props = {
   post:            Post;
@@ -16,7 +17,9 @@ type Props = {
 
 export default function PostCard({ post, project, user, showProjectLink = true }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { getCommentsByPostId, setOpenCommentPostId } = useData();
   const favorited = isFavorite(post.id);
+  const commentCount = getCommentsByPostId(post.id).length;
 
   return (
     <article
@@ -113,11 +116,12 @@ export default function PostCard({ post, project, user, showProjectLink = true }
       {/* Footer */}
       <div className="mt-4 flex items-center gap-3">
         <button
+          onClick={() => setOpenCommentPostId(post.id)}
           className="flex items-center gap-1.5 text-xs transition-colors hover:opacity-80"
           style={{ color: "var(--text-muted)" }}
         >
           <MessageSquare size={13} />
-          <span>応援する</span>
+          <span>コメント{commentCount > 0 ? `（${commentCount}）` : ""}</span>
         </button>
 
         {/* Favorite button */}

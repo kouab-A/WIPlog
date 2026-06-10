@@ -6,6 +6,7 @@ import ThemeProvider from "@/components/ThemeProvider";
 import FavoritesProvider from "@/components/FavoritesProvider";
 import { DataProvider } from "@/lib/store";
 import SidebarLayout from "@/components/SidebarLayout";
+import CommentPanel from "@/components/CommentPanel";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +39,7 @@ export default function RootLayout({
           <FavoritesProvider>
             <Navbar />
             <SidebarLayout>{children}</SidebarLayout>
+            <CommentPanel />
           </FavoritesProvider>
           </DataProvider>
         </ThemeProvider>

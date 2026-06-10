@@ -4,7 +4,7 @@ import {
   createContext, useContext, useState, useEffect, useCallback, ReactNode,
 } from "react";
 import {
-  User, Post, Project,
+  User, Post, Project, Comment,
   users as seedUsers, posts as seedPosts, projects as seedProjects,
 } from "./data";
 
@@ -36,13 +36,18 @@ type DataContextValue = {
   posts: Post[];
   projects: Project[];
   users: User[];
+  comments: Comment[];
   profile: UserProfile;
   updateProfile: (p: UserProfile) => void;
   addPost: (params: AddPostParams) => void;
+  addComment: (postId: string, authorName: string, content: string) => void;
   getUserById: (id: string) => User | undefined;
   getProjectById: (id: string) => Project | undefined;
   getPostsByProjectId: (projectId: string) => Post[];
+  getCommentsByPostId: (postId: string) => Comment[];
   getLatestPostsForTimeline: () => Array<Post & { project: Project; user: User }>;
+  openCommentPostId: string | null;
+  setOpenCommentPostId: (id: string | null) => void;
 };
 
 const DataContext = createContext<DataContextValue | null>(null);
@@ -53,7 +58,9 @@ const STORAGE_VERSION = "v2";
 export function DataProvider({ children }: { children: ReactNode }) {
   const [posts, setPosts]       = useState<Post[]>(seedPosts);
   const [projects, setProjects] = useState<Project[]>(seedProjects);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [profile, setProfile]   = useState<UserProfile>(DEFAULT_PROFILE);
+  const [openCommentPostId, setOpenCommentPostId] = useState<string | null>(null);
 
   useEffect(() => {
     if (localStorage.getItem("wiplog-version") !== STORAGE_VERSION) {
@@ -72,6 +79,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const pf = localStorage.getItem("wiplog-profile");
       if (pf) setProfile(JSON.parse(pf));
     } catch {}
+    try {
+      const sc = localStorage.getItem("wiplog-comments");
+      if (sc) setComments(JSON.parse(sc));
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -81,6 +92,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem("wiplog-projects", JSON.stringify(projects));
   }, [projects]);
+
+  useEffect(() => {
+    localStorage.setItem("wiplog-comments", JSON.stringify(comments));
+  }, [comments]);
 
   const updateProfile = useCallback((p: UserProfile) => {
     setProfile(p);
@@ -132,6 +147,25 @@ export function DataProvider({ children }: { children: ReactNode }) {
     });
   }, [projects]);
 
+  const addComment = useCallback((postId: string, authorName: string, content: string) => {
+    const newComment: Comment = {
+      id: `c_${Date.now()}`,
+      postId,
+      authorName: authorName.trim() || "匿名",
+      content: content.trim(),
+      createdAt: new Date().toISOString(),
+    };
+    setComments((prev) => [...prev, newComment]);
+  }, []);
+
+  const getCommentsByPostId = useCallback(
+    (postId: string) =>
+      comments
+        .filter((c) => c.postId === postId)
+        .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()),
+    [comments]
+  );
+
   const getUserById = useCallback(
     (id: string): User | undefined => {
       if (id === ME_USER_ID) {
@@ -181,8 +215,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   return (
     <DataContext.Provider value={{
-      posts, projects, users: seedUsers, profile,
-      updateProfile, addPost, getUserById, getProjectById, getPostsByProjectId, getLatestPostsForTimeline,
+      posts, projects, users: seedUsers, comments, profile,
+      updateProfile, addPost, addComment, getUserById, getProjectById,
+      getPostsByProjectId, getCommentsByPostId, getLatestPostsForTimeline,
+      openCommentPostId, setOpenCommentPostId,
     }}>
       {children}
     </DataContext.Provider>
