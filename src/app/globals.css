@@ -57,3 +57,27 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-dim);
 }
+
+/* タッチデバイス最適化 */
+button, a {
+  touch-action: manipulation; /* ダブルタップズームを無効化 */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* iOSでのinput自動ズーム防止（font-size < 16px はズームを引き起こす） */
+@media (max-width: 1024px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* iOS safe-area 対応 */
+body {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}

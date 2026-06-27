@@ -10,7 +10,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   const [rightOpen, setRightOpen] = useState(false);
 
   return (
-    <div className="flex max-w-[1200px] mx-auto w-full px-4 gap-5 pt-6 pb-12 items-start relative">
+    <div className="flex max-w-[1200px] mx-auto w-full px-4 gap-5 pt-6 pb-28 lg:pb-12 items-start relative">
 
       {/* Left sidebar — desktop always visible, mobile as drawer */}
       <aside className="hidden lg:block w-60 shrink-0 sticky top-[64px] max-h-[calc(100vh-72px)] overflow-y-auto">

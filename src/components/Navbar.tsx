@@ -61,7 +61,7 @@ export default function Navbar() {
         <nav className="flex items-center gap-1">
           <button
             onClick={toggleColorMode}
-            className="flex items-center justify-center w-8 h-8 rounded-lg transition-colors hover:bg-black/5"
+            className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors hover:bg-black/5"
             style={{ color: "var(--text-muted)" }}
             title={colorMode === "light" ? "ダークモードに切替" : "ライトモードに切替"}
           >
@@ -72,15 +72,15 @@ export default function Navbar() {
 
           <Link
             href="/"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors hover:bg-black/5"
+            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors hover:bg-black/5"
             style={{ color: "var(--text-secondary)" }}
           >
             <Home size={15} />
             <span>タイムライン</span>
           </Link>
           <Link
-            href="/post"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ml-1"
+            href="/#post-form"
+            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ml-1"
             style={{
               background: "var(--accent)",
               color: "white",

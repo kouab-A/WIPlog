@@ -33,10 +33,12 @@ export default function PostForm() {
 
   return (
     <div
+      id="post-form"
       className="rounded-xl p-6"
       style={{
         background: "var(--bg-card)",
         border: "1px solid var(--border)",
+        scrollMarginTop: "72px",
       }}
     >
       <h2

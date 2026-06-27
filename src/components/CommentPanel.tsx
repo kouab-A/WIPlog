@@ -57,9 +57,10 @@ export default function CommentPanel() {
 
       {/* Panel */}
       <div
-        className="fixed top-14 right-0 h-[calc(100vh-56px)] flex flex-col z-[200] transition-transform duration-300"
+        className="fixed top-14 right-0 flex flex-col z-[200] transition-transform duration-300"
         style={{
-          width: "360px",
+          width: "min(360px, 100vw)",
+          height: "calc(100dvh - 56px)",
           background: "var(--bg-card)",
           borderLeft: "1px solid var(--border-subtle)",
           transform: isOpen ? "translateX(0)" : "translateX(100%)",
