@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Send, ImagePlus, CheckCircle2 } from "lucide-react";
 import { useData } from "@/lib/store";
 
-export default function PostForm() {
+export default function PostForm({ onSuccess }: { onSuccess?: () => void }) {
   const { addPost } = useData();
 
   const [progress,     setProgress]     = useState(30);
@@ -28,7 +28,10 @@ export default function PostForm() {
     setProjectTitle("");
     setProgress(30);
     setDone(true);
-    setTimeout(() => setDone(false), 2500);
+    setTimeout(() => {
+      setDone(false);
+      onSuccess?.();
+    }, 2000);
   };
 
   return (

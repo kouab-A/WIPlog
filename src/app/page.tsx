@@ -2,65 +2,46 @@
 
 import { useData } from "@/lib/store";
 import PostCard from "@/components/PostCard";
-import PostForm from "@/components/PostForm";
-import ProjectStrip from "@/components/ProjectStrip";
-import Link from "next/link";
-import { Zap, ArrowRight } from "lucide-react";
+import { ArrowRight, PlusCircle, Pencil } from "lucide-react";
 
 export default function HomePage() {
-  const { getLatestPostsForTimeline } = useData();
+  const { getLatestPostsForTimeline, hasTodayPost, setIsPostModalOpen } = useData();
   const timelinePosts = getLatestPostsForTimeline();
 
   return (
     <div className="py-2">
-      {/* Hero message */}
-      <div className="mb-8 text-center">
-        <div
-          className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full mb-4"
+
+      {/* 今日未記録バナー */}
+      {!hasTodayPost && (
+        <button
+          onClick={() => setIsPostModalOpen(true)}
+          className="w-full mb-6 rounded-xl p-4 flex items-center gap-4 text-left transition-all hover:opacity-90 active:scale-[0.99]"
           style={{
-            background: "var(--accent-glow)",
-            border: "1px solid var(--accent-dim)",
-            color: "var(--accent)",
+            background: "linear-gradient(135deg, var(--accent) 0%, #a78bfa 100%)",
           }}
         >
-          <Zap size={11} />
-          <span>未完成を、誇れ。</span>
-        </div>
-        <h1
-          className="text-2xl font-bold mb-2"
-          style={{ color: "var(--text-primary)" }}
-        >
-          みんなの制作過程
-        </h1>
-        <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-          完成品じゃなくていい。今日の一歩が、誰かの背中を押す。
-        </p>
-      </div>
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+            style={{ background: "rgba(255,255,255,0.2)" }}
+          >
+            <Pencil size={18} className="text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-white">今日の進捗を記録しよう</p>
+            <p className="text-xs text-white/70 mt-0.5">未完成でいい。今日の一歩を残そう。</p>
+          </div>
+          <PlusCircle size={20} className="text-white/80 shrink-0" />
+        </button>
+      )}
 
-      {/* Post form */}
-      <div className="mb-8">
-        <PostForm />
-      </div>
-
-      {/* Active projects strip */}
-      <div className="mb-8">
-        <h2
-          className="text-xs font-semibold uppercase tracking-widest mb-3"
-          style={{ color: "var(--text-muted)" }}
-        >
-          進行中のプロジェクト
-        </h2>
-        <ProjectStrip />
-      </div>
-
-      {/* Timeline */}
+      {/* タイムライン */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2
             className="text-xs font-semibold uppercase tracking-widest"
             style={{ color: "var(--text-muted)" }}
           >
-            グローバルタイムライン
+            タイムライン
           </h2>
           <span className="text-xs" style={{ color: "var(--text-muted)" }}>
             {timelinePosts.length}件の進捗
@@ -75,9 +56,17 @@ export default function HomePage() {
             <p className="text-sm mb-1" style={{ color: "var(--text-muted)" }}>
               まだ投稿がありません
             </p>
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-              上のフォームから最初の進捗を記録しましょう
+            <p className="text-xs mb-4" style={{ color: "var(--text-muted)" }}>
+              最初の進捗を記録してみましょう
             </p>
+            <button
+              onClick={() => setIsPostModalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
+              style={{ background: "var(--accent)", color: "white" }}
+            >
+              <PlusCircle size={14} />
+              記録する
+            </button>
           </div>
         ) : (
           <>
@@ -108,6 +97,23 @@ export default function HomePage() {
           </>
         )}
       </div>
+
+      {/* FAB — 記録するボタン（画面右下固定） */}
+      <button
+        onClick={() => setIsPostModalOpen(true)}
+        className="fixed right-4 z-[90] flex items-center gap-2 px-4 py-3 rounded-full shadow-lg transition-all hover:scale-105 active:scale-95"
+        style={{
+          bottom: "calc(56px + 16px)",
+          background: "var(--accent)",
+          color: "white",
+          boxShadow: "0 4px 20px rgba(124,106,248,0.5)",
+        }}
+        aria-label="進捗を記録する"
+      >
+        <PlusCircle size={18} />
+        <span className="text-sm font-semibold">記録する</span>
+      </button>
+
     </div>
   );
 }

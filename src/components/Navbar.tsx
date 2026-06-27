@@ -6,9 +6,10 @@ import ThemeSelector from "./ThemeSelector";
 import { useTheme } from "./ThemeProvider";
 import { useData } from "@/lib/store";
 
+
 export default function Navbar() {
   const { colorMode, toggleColorMode } = useTheme();
-  const { profile } = useData();
+  const { profile, setIsPostModalOpen } = useData();
 
   return (
     <header
@@ -78,8 +79,8 @@ export default function Navbar() {
             <Home size={15} />
             <span>タイムライン</span>
           </Link>
-          <Link
-            href="/#post-form"
+          <button
+            onClick={() => setIsPostModalOpen(true)}
             className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ml-1"
             style={{
               background: "var(--accent)",
@@ -88,7 +89,7 @@ export default function Navbar() {
           >
             <PlusCircle size={15} />
             <span>記録する</span>
-          </Link>
+          </button>
         </nav>
       </div>
     </header>

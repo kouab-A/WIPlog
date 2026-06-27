@@ -48,6 +48,9 @@ type DataContextValue = {
   getLatestPostsForTimeline: () => Array<Post & { project: Project; user: User }>;
   openCommentPostId: string | null;
   setOpenCommentPostId: (id: string | null) => void;
+  isPostModalOpen: boolean;
+  setIsPostModalOpen: (open: boolean) => void;
+  hasTodayPost: boolean;
 };
 
 const DataContext = createContext<DataContextValue | null>(null);
@@ -61,6 +64,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [profile, setProfile]   = useState<UserProfile>(DEFAULT_PROFILE);
   const [openCommentPostId, setOpenCommentPostId] = useState<string | null>(null);
+  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+
+  const hasTodayPost = posts.some((p) => {
+    if (p.userId !== ME_USER_ID) return false;
+    return new Date(p.createdAt).toDateString() === new Date().toDateString();
+  });
 
   useEffect(() => {
     if (localStorage.getItem("wiplog-version") !== STORAGE_VERSION) {
@@ -219,6 +228,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       updateProfile, addPost, addComment, getUserById, getProjectById,
       getPostsByProjectId, getCommentsByPostId, getLatestPostsForTimeline,
       openCommentPostId, setOpenCommentPostId,
+      isPostModalOpen, setIsPostModalOpen, hasTodayPost,
     }}>
       {children}
     </DataContext.Provider>

@@ -3,17 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, PlusCircle, User } from "lucide-react";
+import { useData } from "@/lib/store";
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { setIsPostModalOpen } = useData();
   const isHome    = pathname === "/";
   const isProfile = pathname === "/profile";
-
-  const items = [
-    { href: "/",        icon: Home,       label: "ホーム",      active: isHome },
-    { href: "/#post-form", icon: PlusCircle, label: "記録する",  active: false },
-    { href: "/profile", icon: User,       label: "プロフィール", active: isProfile },
-  ];
 
   return (
     <nav
@@ -26,17 +22,32 @@ export default function BottomNav() {
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
     >
-      {items.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className="flex-1 flex flex-col items-center justify-center gap-1 py-3 transition-opacity active:opacity-60"
-          style={{ color: item.active ? "var(--accent)" : "var(--text-muted)" }}
-        >
-          <item.icon size={22} strokeWidth={item.active ? 2.5 : 1.5} />
-          <span className="text-[11px]">{item.label}</span>
-        </Link>
-      ))}
+      <Link
+        href="/"
+        className="flex-1 flex flex-col items-center justify-center gap-1 py-3 transition-opacity active:opacity-60"
+        style={{ color: isHome ? "var(--accent)" : "var(--text-muted)" }}
+      >
+        <Home size={22} strokeWidth={isHome ? 2.5 : 1.5} />
+        <span className="text-[11px]">ホーム</span>
+      </Link>
+
+      <button
+        onClick={() => setIsPostModalOpen(true)}
+        className="flex-1 flex flex-col items-center justify-center gap-1 py-3 transition-opacity active:opacity-60"
+        style={{ color: "var(--accent)" }}
+      >
+        <PlusCircle size={22} strokeWidth={1.5} />
+        <span className="text-[11px]">記録する</span>
+      </button>
+
+      <Link
+        href="/profile"
+        className="flex-1 flex flex-col items-center justify-center gap-1 py-3 transition-opacity active:opacity-60"
+        style={{ color: isProfile ? "var(--accent)" : "var(--text-muted)" }}
+      >
+        <User size={22} strokeWidth={isProfile ? 2.5 : 1.5} />
+        <span className="text-[11px]">プロフィール</span>
+      </Link>
     </nav>
   );
 }
