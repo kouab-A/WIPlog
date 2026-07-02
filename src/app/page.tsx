@@ -1,118 +1,75 @@
 "use client";
 
-import { useData } from "@/lib/store";
-import PostCard from "@/components/PostCard";
-import { ArrowRight, PlusCircle, Pencil } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import QuickInputBar from "@/components/Dashboard/QuickInputBar";
+import FocusView     from "@/components/Dashboard/FocusView";
+import OverviewView  from "@/components/Dashboard/OverviewView";
 
-export default function HomePage() {
-  const { getLatestPostsForTimeline, hasTodayPost, setIsPostModalOpen } = useData();
-  const timelinePosts = getLatestPostsForTimeline();
+type Mode = "focus" | "overview";
+
+export default function DashboardPage() {
+  const [mode, setMode] = useState<Mode>("focus");
 
   return (
-    <div className="py-2">
+    <div className="py-4 flex flex-col gap-6">
 
-      {/* 今日未記録バナー */}
-      {!hasTodayPost && (
-        <button
-          onClick={() => setIsPostModalOpen(true)}
-          className="w-full mb-6 rounded-xl p-4 flex items-center gap-4 text-left transition-all hover:opacity-90 active:scale-[0.99]"
-          style={{
-            background: "linear-gradient(135deg, var(--accent) 0%, #a78bfa 100%)",
-          }}
-        >
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-            style={{ background: "rgba(255,255,255,0.2)" }}
-          >
-            <Pencil size={18} className="text-white" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-white">今日の進捗を記録しよう</p>
-            <p className="text-xs text-white/70 mt-0.5">未完成でいい。今日の一歩を残そう。</p>
-          </div>
-          <PlusCircle size={20} className="text-white/80 shrink-0" />
-        </button>
-      )}
+      {/* Quick input bar */}
+      <QuickInputBar />
 
-      {/* タイムライン */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2
-            className="text-xs font-semibold uppercase tracking-widest"
-            style={{ color: "var(--text-muted)" }}
-          >
-            タイムライン
-          </h2>
-          <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-            {timelinePosts.length}件の進捗
-          </span>
-        </div>
-
-        {timelinePosts.length === 0 ? (
-          <div
-            className="rounded-xl p-10 text-center"
-            style={{ border: "1px dashed var(--border)" }}
-          >
-            <p className="text-sm mb-1" style={{ color: "var(--text-muted)" }}>
-              まだ投稿がありません
-            </p>
-            <p className="text-xs mb-4" style={{ color: "var(--text-muted)" }}>
-              最初の進捗を記録してみましょう
-            </p>
+      {/* Mode toggle */}
+      <div
+        className="flex p-1 rounded-xl"
+        style={{ background: "var(--bg-elevated)", border: "1px solid var(--border-subtle)" }}
+      >
+        {(["focus", "overview"] as const).map((m) => {
+          const labels: Record<Mode, { short: string; long: string }> = {
+            focus:    { short: "フォーカス",   long: "今日" },
+            overview: { short: "オーバービュー", long: "全体" },
+          };
+          const active = mode === m;
+          return (
             <button
-              onClick={() => setIsPostModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
-              style={{ background: "var(--accent)", color: "white" }}
+              key={m}
+              onClick={() => setMode(m)}
+              className="flex-1 relative flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-colors"
+              style={{ color: active ? "var(--text-primary)" : "var(--text-muted)" }}
             >
-              <PlusCircle size={14} />
-              記録する
-            </button>
-          </div>
-        ) : (
-          <>
-            <div className="flex flex-col gap-4">
-              {timelinePosts.map((item) => (
-                <PostCard
-                  key={item.id}
-                  post={item}
-                  project={item.project}
-                  user={item.user}
-                  showProjectLink={true}
+              {active && (
+                <motion.div
+                  layoutId="mode-bg"
+                  className="absolute inset-0 rounded-lg"
+                  style={{ background: "var(--bg-card)", boxShadow: "0 1px 6px rgba(0,0,0,0.12)" }}
+                  transition={{ type: "spring", stiffness: 380, damping: 36 }}
                 />
-              ))}
-            </div>
-
-            <div className="mt-8 text-center">
-              <button
-                className="flex items-center gap-2 mx-auto text-sm px-4 py-2 rounded-lg transition-colors"
+              )}
+              <span className="relative z-10">{labels[m].short}</span>
+              <span
+                className="relative z-10 text-xs px-1.5 py-0.5 rounded"
                 style={{
-                  color: "var(--text-muted)",
-                  border: "1px solid var(--border)",
+                  background: active ? "var(--accent-glow)" : "transparent",
+                  color:      active ? "var(--accent)" : "var(--text-muted)",
                 }}
               >
-                <span>もっと見る</span>
-                <ArrowRight size={14} />
-              </button>
-            </div>
-          </>
-        )}
+                {labels[m].long}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* FAB — 記録するボタン（画面右下固定） */}
-      <button
-        onClick={() => setIsPostModalOpen(true)}
-        className="fixed right-4 z-[90] flex items-center gap-2 px-4 py-3 rounded-full shadow-lg transition-all hover:scale-105 active:scale-95"
-        style={{
-          bottom: "calc(56px + 16px)",
-          background: "var(--accent)",
-          color: "white",
-          boxShadow: "0 4px 20px rgba(124,106,248,0.5)",
-        }}
-        aria-label="進捗を記録する"
-      >
-        <PlusCircle size={18} />
-        <span className="text-sm font-semibold">記録する</span>
-      </button>
+      {/* Content */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={mode}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+        >
+          {mode === "focus" ? <FocusView /> : <OverviewView />}
+        </motion.div>
+      </AnimatePresence>
 
     </div>
   );
